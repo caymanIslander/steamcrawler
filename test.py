@@ -67,12 +67,23 @@ def create_config():
         else:    
             config['Steam']['ID'] = steam_id
 
-
-    
-
-
     write_config('config.ini', config)
     print("Created config file.\n", config)
+
+def go_to_profile():
+    config_file = 'config.ini'
+    Url2profile = read_config(config_file)
+    response = requests.get(Url2profile)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    level = soup.find('div', {'class': 'persona_level'}).get_text(strip=True)
+    game_count = soup.find('div', {'class': 'profile_count_link_total'}).get_text(strip=True)
+    screenshot_count = soup.find('a', {'data-modal-content-id': 'Screenshot'}).find('span').get_text(strip=True)
+    return {
+        'level': level,
+        'game_count': game_count,
+        'screenshot_count': screenshot_count
+    }
+
 
 def print_ascii_art(file_name):
     try:
@@ -90,7 +101,9 @@ def main():
     if os.path.getsize(config_file) == 28:
         print("No changes in config file, creating config file.\n")
         create_config()
-    
+    else:
+        go_to_profile()
+
     
 if __name__ == '__main__':
     main()
